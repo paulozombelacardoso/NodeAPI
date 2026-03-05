@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Cadastro de Usuário</title>
+  <style>
+    table {
+      border-collapse: collapse;
+      width: 50%;
+      margin-top: 20px;
+    }
+    th, td {
+      border: 1px solid #000;
+      padding: 8px;
+      text-align: left;
+    }
+  </style>
+</head>
+<body>
+
+  <h2>Criar Usuário</h2>
+
+  <form id="userForm">
+    <input type="text" id="name" placeholder="Nome" required />
+    <input type="email" id="email" placeholder="Email" required />
+    <button type="submit">Cadastrar</button>
+  </form>
+
+  <h2>Lista de Usuários</h2>
+  <table id="userTable">
+    <thead>
+      <tr>
+        <th>Nome</th>
+        <th>Email</th>
+      </tr>
+    </thead>
+    <tbody>
+      <!-- Usuários serão adicionados aqui -->
+    </tbody>
+  </table>
+
+  <script>
+    const form = document.getElementById('userForm');
+    const tableBody = document.querySelector('#userTable tbody');
+
+    // Função para atualizar a tabela
+    async function fetchUsers() {
+      const response = await fetch('http://localhost:3000/usuarios');
+      const users = await response.json();
+
+      // Limpa a tabela antes de preencher
+      tableBody.innerHTML = '';
+
+      users.forEach(user => {
+        const row = document.createElement('tr');
+        row.innerHTML = `
+          <td>${user.name}</td>
+          <td>${user.email}</td>
+        `;
+        tableBody.appendChild(row);
+      });
+    }
+
+    // Chama a função ao carregar a página
+    fetchUsers();
+
+    // Cadastrar novo usuário
+    form.addEventListener('submit', async (event) => {
+      event.preventDefault();
+
+      const name = document.getElementById('name').value;
+      const email = document.getElementById('email').value;
+
+      const response = await fetch('http://localhost:3000/usuarios', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ name, email })
+      });
+
+      if (response.ok) {
+        alert('Usuário criado com sucesso!');
+        form.reset();
+        fetchUsers(); // Atualiza a tabela
+      } else {
+        alert('Erro ao criar usuário');
+      }
+    });
+  </script>
+
+</body>
+</html>
